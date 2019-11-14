@@ -1,29 +1,31 @@
 var mongoose = require('mongoose');
 var connection = require('../lib/database');
 
-var userSchema = mongoose.Schema({
-   token: String,
-   fname: {
+var vehiclesSchema = mongoose.Schema({
+   type: {
       type: String,
       required: true,
       trim: true
    },
-   lname: {
+   brand: {
       type: String,
       required: true,
       trim: true
    },
-   email: {
+   model: {
       type: String,
-      unique: true,
       required: true,
       trim: true
    },
-   password: {
+   image: {
+      type: String,
+      required: true,
+      trim: true
+   },
+   lastUpdate: {
       type: String,
       required: true
-   },
-   usertype: String,
+   }
 });
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model('vehicles', vehiclesSchema);

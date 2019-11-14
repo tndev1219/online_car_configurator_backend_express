@@ -57,7 +57,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+# .env
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -80,3 +80,7 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# model Data
+# public/images/*
+# public/models/*

@@ -1,29 +1,30 @@
 var mongoose = require('mongoose');
 var connection = require('../lib/database');
 
-var userSchema = mongoose.Schema({
-   token: String,
-   fname: {
+var partialsSchema = mongoose.Schema({
+   modelType: {
       type: String,
       required: true,
       trim: true
    },
-   lname: {
+   modelPath: {
       type: String,
       required: true,
       trim: true
    },
-   email: {
+   imagePath: {
       type: String,
-      unique: true,
       required: true,
       trim: true
    },
-   password: {
+   modelName: {
       type: String,
-      required: true
+      required: true,
+      trim: true
    },
-   usertype: String,
+   modelMinSize: {
+      type: Number
+   }
 });
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model('partials', partialsSchema);

@@ -5,8 +5,9 @@ var userController = require('../controllers/userController');
 
 router.post('/signup', userController.signup);
 router.post('/signin', userController.signin);
-router.post('/logout', userController.logout);
 router.post('/forgotpassword', userController.forgotpassword);
 router.post('/resetpassword', userController.resetpassword);
+router.post('/getVehicles', userController.authCheck, userController.getVehicles);
+router.post('/getPartials', userController.authCheck, userController.getPartials);
 
 module.exports = router;

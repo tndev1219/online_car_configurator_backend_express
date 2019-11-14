@@ -3,35 +3,20 @@ var router = express.Router();
 
 var adminController = require('../controllers/adminController');
 
-var redirect = function(req, res, next) {
-    if (req.session.admin) {
-        next();
-    } else {
-        res.render('admin/login');
-    }
-}
-
-router.get('/', function(req, res) {
-    res.redirect('/login');
-});
-router.get('/login', redirect, function(req, res) {
-    res.redirect('/dashboard');
-});
-router.get('/dashboard', redirect, function(req, res) {
-    res.render('admin/dashboard', req.session.admin);
-});
-router.get('/news', redirect, function(req, res) {
-    res.render('admin/news', req.session.admin);
-});
-router.get('/logout', function(req, res) {
-    req.session.admin = null;
-    res.redirect('/login');
-});
-router.get('*', function(req, res, next) {
-    res.render('admin/template/error');
-});
-
 router.post('/signup', adminController.signup);
 router.post('/signin', adminController.signin);
+router.post('/autoSignInWithToken', adminController.autoSignInWithToken);
+router.post('/uploadImage', adminController.uploadImage);
+router.post('/uploadModel', adminController.uploadModel);
+router.get('/getVehicles', adminController.authCheck, adminController.getVehicles);
+router.post('/addVehicle', adminController.authCheck, adminController.addVehicle);
+router.post('/updateVehicle', adminController.authCheck, adminController.updateVehicle);
+router.post('/removeVehicle', adminController.authCheck, adminController.removeVehicle);
+router.post('/removeVehicles', adminController.authCheck, adminController.removeVehicles);
+router.get('/getWheels', adminController.authCheck, adminController.getWheels);
+router.post('/addWheel', adminController.authCheck, adminController.addWheel);
+router.post('/updateWheel', adminController.authCheck, adminController.updateWheel);
+router.post('/removeWheel', adminController.authCheck, adminController.removeWheel);
+router.post('/removeWheels', adminController.authCheck, adminController.removeWheels);
 
 module.exports = router;
