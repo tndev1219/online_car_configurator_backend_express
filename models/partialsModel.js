@@ -2,28 +2,33 @@ var mongoose = require('mongoose');
 var connection = require('../lib/database');
 
 var partialsSchema = mongoose.Schema({
-   modelType: {
+   type: {
       type: String,
       required: true,
       trim: true
    },
-   modelPath: {
+   name: {
       type: String,
       required: true,
       trim: true
    },
-   imagePath: {
+   min_size: {
+      type: Number,
+      trim: true
+   },
+   model: {
       type: String,
       required: true,
       trim: true
    },
-   modelName: {
+   image: {
       type: String,
       required: true,
       trim: true
    },
-   modelMinSize: {
-      type: Number
+   lastUpdate: {
+      type: String,
+      required: true
    }
 });
 

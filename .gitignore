@@ -82,5 +82,5 @@ typings/
 .dynamodb/
 
 # model Data
-# public/images/*
-# public/models/*
+public/images/*
+public/models/*

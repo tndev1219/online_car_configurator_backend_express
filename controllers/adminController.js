@@ -12,6 +12,7 @@ var constants = require('../conf/constants');
 var Admin = require('../models/userModel');
 var Vehicle = require('../models/vehiclesModel');
 var Wheel = require('../models/wheelsModel');
+var Partial = require('../models/partialsModel');
 
 const jwtConfig = {
    "secret"   : "online_car_configurator_admin_sacret_key",
@@ -20,28 +21,35 @@ const jwtConfig = {
 
 // User Authontication
 exports.authCheck = function(req, res, next) {
-
-   const access_token = req.session.admin.token;
-   
-   jwt.verify(access_token, jwtConfig.secret, function(err, data) {
-      if (err) {
-         if (err.message === 'jwt expired') {
-            res.json({
-               success: false,
-               message: 'Access token expired!',
-               code: constants.TokenError
-            });
+   if (req.session.admin) {
+      const access_token = req.session.admin.token;
+      
+      jwt.verify(access_token, jwtConfig.secret, function(err, data) {
+         if (err) {
+            if (err.message === 'jwt expired') {
+               res.json({
+                  success: false,
+                  message: 'Access token expired!',
+                  code: constants.TokenError
+               });
+            } else {
+               res.json({
+                  success: false,
+                  message: 'Invalid token!',
+                  code: constants.TokenError
+               });
+            }
          } else {
-            res.json({
-               success: false,
-               message: 'Invalid token!',
-               code: constants.TokenError
-            });
+            next();
          }
-      } else {
-         next();
-      }
-   });
+      });
+   } else {
+      res.json({
+         success: false,
+         message: 'Invalid token!',
+         code: constants.TokenError
+      });
+   }
 };
 
 exports.signup = function (req, res) {
@@ -442,6 +450,115 @@ exports.removeWheels = function(req, res) {
          res.json({
             success: true,
             message: 'Delete Wheels Data Success!',
+            code: constants.SuccessCode
+         });
+      }
+   });
+};
+
+// Partials Data CRUD
+exports.getPartials = function(req, res) {
+   
+   Partial.find({type: req.body.type}).sort({name: 1}).exec(function(err, partials) {
+      if (err) {
+         res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });
+      } else {
+         res.json({
+            success: true,
+            message: `Get ${req.body.type}s Data Success!`,
+            code: constants.SuccessCode,
+            result: partials
+         });
+      }
+   });
+};
+
+exports.addPartial = function(req, res) {
+
+   var partial = new Partial();
+   
+   partial.type = req.body.newPartial.type;
+   partial.name = req.body.newPartial.name;
+   partial.image = req.body.newPartial.image;
+   partial.model = req.body.newPartial.model;
+   partial.lastUpdate = moment(new Date()).format('MMMM Do YYYY, hh:mm:ss a');
+   if (req.body.newPartial.min_size) {
+      partial.min_size = req.body.newPartial.min_size;
+   }
+   
+   partial.save(function (err) {
+      if (err) {
+         res.json({
+            success: false,
+            msg: err.message,
+            code: constants.ErrorCode
+         });
+      } else {
+         res.json({
+            success: true,
+            msg: `New ${partial.type} Added!`,
+            code: constants.SuccessCode,
+            result: partial
+         });
+      }
+   });
+};
+
+exports.updatePartial = function(req, res) {
+   
+   Partial.findOneAndUpdate({_id: req.body.partial._id}, req.body.partial).exec(function(err) {
+      if (err) {
+         res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });   
+      } else {
+         res.json({
+            success: true,
+            message: `Update ${req.body.partial.type} Data Success!`,
+            code: constants.SuccessCode
+         });
+      }
+   });
+};
+
+exports.removePartial = function(req, res) {
+   
+   Partial.findOneAndDelete({_id: req.body.partialId}).exec(function(err, partial) {
+      if (err) {
+         res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });   
+      } else {
+         res.json({
+            success: true,
+            message: `Delete Partials Data Success!`,
+            code: constants.SuccessCode
+         });
+      }
+   });
+};
+
+exports.removePartials = function(req, res) {
+   
+   Partial.deleteMany({_id: req.body.partialIds}).exec(function(err) {
+      if (err) {
+         res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });   
+      } else {
+         res.json({
+            success: true,
+            message: `Delete Partials Data Success!`,
             code: constants.SuccessCode
          });
       }
