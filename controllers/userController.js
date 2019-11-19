@@ -1,13 +1,14 @@
 'user strict';
 require('dotenv').config();
 
-var crypto = require('crypto');
+var crypto     = require('crypto');
 var nodeMailer = require('nodemailer');
 
-var constants = require('../conf/constants');
-var User = require('../models/userModel');
-var Vehicle = require('../models/vehiclesModel');
-var Wheel = require('../models/wheelsModel');
+var constants  = require('../conf/constants');
+var User       = require('../models/userModel');
+var Vehicle    = require('../models/vehiclesModel');
+var Wheel      = require('../models/wheelsModel');
+var Partial    = require('../models/partialsModel');
 
 exports.authCheck = function(req, res, next) {
    next();
@@ -240,11 +241,89 @@ exports.getPartials = function(req, res) {
             }
          }
 
-         res.json({
-            success: true,
-            message: 'Successfully Get Partials Data!',
-            code: constants.SuccessCode,
-            result: {wheelsData}
+         Partial.find().sort({type: 1, name: 1}).exec(function(err, partials) {
+            if (err) {
+               res.json({
+                  success: false,
+                  message: 'Failed to Get Partials Data. Please Try Again Later...',
+                  code: constants.ErrorCode
+               });
+            } else {
+               var tiresData           = [],
+                   suspensionsData     = [],
+                   shockData           = [],
+                   frontbumperData     = [],
+                   rearbumperData      = [],
+                   fenderData          = [],
+                   grilleData          = [],
+                   headlightData       = [],
+                   hoodData            = [],
+                   bedcoverData        = [],
+                   bedaccessoryData    = [],
+                   additionallightData = [],
+                   hitchData           = [];                   
+               var model = {};
+
+               for (var i = 0; i < partials.length; i++) {
+
+                  model.modelType = partials[i].type;
+                  model.imagePath = partials[i].image;
+                  model.modelPath = partials[i].model;
+                  model.midelName = partials[i].name;
+                  model.modelMinSize = partials[i].min_size;
+
+                  if (model.modelType === 'tire') {
+                     tiresData.push(model);
+                  } else if (model.modelType === 'suspension') {
+                     suspensionsData.push(model);
+                  } else if (model.modelType === 'shock') {
+                     shockData.push(model);
+                  } else if (model.modelType === 'frontbumper') {
+                     frontbumperData.push(model);
+                  } else if (model.modelType === 'rearbumper') {
+                     rearbumperData.push(model);
+                  } else if (model.modelType === 'fender') {
+                     fenderData.push(model);
+                  } else if (model.modelType === 'grille') {
+                     grilleData.push(model);
+                  } else if (model.modelType === 'headlight') {
+                     headlightData.push(model);
+                  } else if (model.modelType === 'hood') {
+                     hoodData.push(model);
+                  } else if (model.modelType === 'bedcover') {
+                     bedcoverData.push(model);
+                  } else if (model.modelType === 'bedaccessory') {
+                     bedaccessoryData.push(model);
+                  } else if (model.modelType === 'additionallight') {
+                     additionallightData.push(model);
+                  } else if (model.modelType === 'hitch') {
+                     hitchData.push(model);
+                  }
+                  model = {};
+               }
+               
+               res.json({
+                  success: true,
+                  message: 'Successfully Get Partials Data!',
+                  code: constants.SuccessCode,
+                  result: {
+                     wheelsData,
+                     tiresData,
+                     suspensionsData,
+                     shockData,
+                     frontbumperData,
+                     rearbumperData,
+                     fenderData,
+                     grilleData,
+                     headlightData,
+                     hoodData,
+                     bedcoverData,
+                     bedaccessoryData,
+                     additionallightData,
+                     hitchData
+                  }
+               });
+            }
          });
       }
    });
