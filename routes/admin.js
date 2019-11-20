@@ -28,6 +28,7 @@ router.post('/removeWheels', adminController.authCheck, adminController.removeWh
 
 // partials data crud
 router.post('/getPartials', adminController.authCheck, adminController.getPartials);
+router.post('/getVehicleTypes', adminController.authCheck, adminController.getVehicleTypes);
 router.post('/addPartial', adminController.authCheck, adminController.addPartial);
 router.post('/updatePartial', adminController.authCheck, adminController.updatePartial);
 router.post('/removePartial', adminController.authCheck, adminController.removePartial);

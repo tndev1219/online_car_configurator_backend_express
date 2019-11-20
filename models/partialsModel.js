@@ -12,6 +12,11 @@ var partialsSchema = mongoose.Schema({
       required: true,
       trim: true
    },
+   vehicle_type: {
+      type: String,
+      required: true,
+      trim: true
+   },
    min_size: {
       type: Number,
       trim: true

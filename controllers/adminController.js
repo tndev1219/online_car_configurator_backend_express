@@ -65,13 +65,13 @@ exports.signup = function (req, res) {
       if (err) {
          res.json({
             success: false,
-            msg: err.message,
+            message: err.message,
             code: constants.ErrorCode
          });
       } else {
          res.json({
             success: true,
-            msg: 'New admin created!',
+            message: 'New admin created!',
             code: constants.SuccessCode,
             result: admin
          });
@@ -88,14 +88,14 @@ exports.signin = function (req, res) {
       if (err) {
          res.json({
             success: false,
-            msg: err.message,
+            message: err.message,
             code: constants.ErrorCode
          });
       }
       if (!admin || admin.password != crypto.createHash('md5').update(req.body.password).digest('hex')) {
          res.json({
             success: false,
-            msg: 'Authentication failed!',
+            message: 'Authentication failed!',
             code: constants.AuthError
          });
       } else {
@@ -104,7 +104,7 @@ exports.signin = function (req, res) {
          
          res.json({
             success: true,
-            msg: 'Login Success!',
+            message: 'Login Success!',
             code: constants.SuccessCode,
             result: admin.token
          });
@@ -120,7 +120,7 @@ exports.autoSignInWithToken = function(req, res) {
       if (err) {
          res.json({
             success: false,
-            msg: err.message,
+            message: err.message,
             code: constants.AuthError
          });
       } else {
@@ -128,7 +128,7 @@ exports.autoSignInWithToken = function(req, res) {
             if (err) {
                res.json({
                   success: false,
-                  msg: err.message,
+                  message: err.message,
                   code: constants.ErrorCode
                });
             } else {
@@ -137,7 +137,7 @@ exports.autoSignInWithToken = function(req, res) {
                
                res.json({
                   success: true,
-                  msg: 'AutoLogin Success!',
+                  message: 'AutoLogin Success!',
                   code: constants.SuccessCode,
                   result: admin.token
                });
@@ -279,13 +279,13 @@ exports.addVehicle = function(req, res) {
       if (err) {
          res.json({
             success: false,
-            msg: err.message,
+            message: err.message,
             code: constants.ErrorCode
          });
       } else {
          res.json({
             success: true,
-            msg: 'New Vehicle Added!',
+            message: 'New Vehicle Added!',
             code: constants.SuccessCode,
             result: vehicle
          });
@@ -295,7 +295,7 @@ exports.addVehicle = function(req, res) {
 
 exports.updateVehicle = function(req, res) {
    
-   Vehicle.findOneAndUpdate({_id: req.body.vehicle._id}, req.body.vehicle).exec(function(err) {
+   Vehicle.findOneAndUpdate({_id: req.body.vehicle._id}, req.body.vehicle).exec(function(err, originVehicle) {
       if (err) {
          res.json({
             success: false,
@@ -303,6 +303,8 @@ exports.updateVehicle = function(req, res) {
             code: constants.ErrorCode
          });   
       } else {
+         Partial.updateMany({vehicle_type: originVehicle.type}, {vehicle_type: req.body.vehicle.type}).exec(function(err, result) {});
+
          res.json({
             success: true,
             message: 'Update Vehicle Data Success!',
@@ -313,8 +315,9 @@ exports.updateVehicle = function(req, res) {
 };
 
 exports.removeVehicle = function(req, res) {
-   
+
    Vehicle.findOneAndDelete({_id: req.body.vehicleId}).exec(function(err, vehicle) {
+
       if (err) {
          res.json({
             success: false,
@@ -322,6 +325,8 @@ exports.removeVehicle = function(req, res) {
             code: constants.ErrorCode
          });   
       } else {
+         Partial.deleteMany({vehicle_type: vehicle.type}).exec(function(err, vehicle) {});
+         
          res.json({
             success: true,
             message: 'Delete Vehicle Data Success!',
@@ -332,8 +337,8 @@ exports.removeVehicle = function(req, res) {
 };
 
 exports.removeVehicles = function(req, res) {
-   
-   Vehicle.deleteMany({_id: req.body.vehicleIds}).exec(function(err, vehicle) {
+
+   Vehicle.find({_id: req.body.vehicleIds}).exec(function(err, vehicles) {
       if (err) {
          res.json({
             success: false,
@@ -341,10 +346,29 @@ exports.removeVehicles = function(req, res) {
             code: constants.ErrorCode
          });   
       } else {
-         res.json({
-            success: true,
-            message: 'Delete Vehicles Data Success!',
-            code: constants.SuccessCode
+         var vehicleTypes = [];
+         for (var i = 0; i < vehicles.length; i++) {
+            if (!vehicleTypes.includes(vehicles[i].type)) {
+               vehicleTypes.push(vehicles[i].type);
+            }
+         }
+
+         Partial.deleteMany({vehicle_type: vehicleTypes}).exec(function(err, result) {});
+
+         Vehicle.deleteMany({_id: req.body.vehicleIds}).exec(function(err, result) {
+            if (err) {
+               res.json({
+                  success: false,
+                  message: err.message,
+                  code: constants.ErrorCode
+               });   
+            } else {
+               res.json({
+                  success: true,
+                  message: 'Delete Vehicles Data Success!',
+                  code: constants.SuccessCode
+               });
+            }
          });
       }
    });
@@ -385,13 +409,13 @@ exports.addWheel = function(req, res) {
       if (err) {
          res.json({
             success: false,
-            msg: err.message,
+            message: err.message,
             code: constants.ErrorCode
          });
       } else {
          res.json({
             success: true,
-            msg: 'New Wheel Added!',
+            message: 'New Wheel Added!',
             code: constants.SuccessCode,
             result: wheel
          });
@@ -477,15 +501,47 @@ exports.getPartials = function(req, res) {
    });
 };
 
+exports.getVehicleTypes = function(req, res) {
+
+   Vehicle.find().sort({type: 1}).exec(function(err, result) {
+      if (err) {
+         res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });
+      } else {
+         var vehicleTypes = [];
+
+         if (result.length !== 0) {
+            for (var i = 0; i < result.length; i++) {
+               if (!vehicleTypes.includes(result[i].type)) {
+                  vehicleTypes.push(result[i].type);
+               }
+            }
+         }
+
+         res.json({
+            success: true,
+            message: `Get Vehicle Types Data Success!`,
+            code: constants.SuccessCode,
+            result: vehicleTypes
+         });
+      }
+   });
+};
+
 exports.addPartial = function(req, res) {
 
    var partial = new Partial();
    
    partial.type = req.body.newPartial.type;
    partial.name = req.body.newPartial.name;
+   partial.vehicle_type = req.body.newPartial.vehicle_type;
    partial.image = req.body.newPartial.image;
    partial.model = req.body.newPartial.model;
    partial.lastUpdate = moment(new Date()).format('MMMM Do YYYY, hh:mm:ss a');
+
    if (req.body.newPartial.min_size) {
       partial.min_size = req.body.newPartial.min_size;
    }
@@ -494,13 +550,13 @@ exports.addPartial = function(req, res) {
       if (err) {
          res.json({
             success: false,
-            msg: err.message,
+            message: err.message,
             code: constants.ErrorCode
          });
       } else {
          res.json({
             success: true,
-            msg: `New ${partial.type} Added!`,
+            message: `New ${partial.type} Added!`,
             code: constants.SuccessCode,
             result: partial
          });
