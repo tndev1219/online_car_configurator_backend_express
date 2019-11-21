@@ -208,7 +208,7 @@ exports.getVehicles = function(req, res) {
 };
 
 exports.getPartials = function(req, res) {
-
+   
    Wheel.find().sort({brand: 1, name: 1}).exec(function(err, wheels) {
       if (err) {
          res.json({
@@ -241,7 +241,7 @@ exports.getPartials = function(req, res) {
             }
          }
 
-         Partial.find().sort({type: 1, name: 1}).exec(function(err, partials) {
+         Partial.find({vehicle_type: req.body.vehicle_type}).sort({type: 1, name: 1}).exec(function(err, partials) {
             if (err) {
                res.json({
                   success: false,
@@ -269,7 +269,7 @@ exports.getPartials = function(req, res) {
                   model.modelType = partials[i].type;
                   model.imagePath = partials[i].image;
                   model.modelPath = partials[i].model;
-                  model.midelName = partials[i].name;
+                  model.modelName = partials[i].name;
                   model.modelMinSize = partials[i].min_size;
 
                   if (model.modelType === 'tire') {
