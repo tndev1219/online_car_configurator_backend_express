@@ -10,19 +10,20 @@ var adminRouter = require('./routes/admin');
 
 var app = express();
 
+app.use(cors());
 app.use(logger('dev'));
 app.use(cookieParser());
 app.use(session({
    secret: 'online_car_configurator',
    resave: false,
-   saveUninitialized: true
+   saveUninitialized: true,
+   cookie: {secure: true}
 }));
 app.use(express.json());
 app.use(express.urlencoded({
    extended: false
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
 
 app.use('/admin', adminRouter);
 app.use('/apis', apisRouter);

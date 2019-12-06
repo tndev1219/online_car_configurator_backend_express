@@ -26,19 +26,19 @@ exports.signup = function (req, res) {
    user.save(function (err) {
       if (err) {
          if (err.code === 11000) {
-            res.json({
+            return res.json({
                success: false,
                message: 'Email Already Exist!',
                code: constants.ExistError
             });
          }
-         res.json({
+         return res.json({
             success: false,
             message: 'Unable to Create Account. Please Try Again Later...',
             code: constants.ErrorCode
          });
       } else {
-         res.json({
+         return res.json({
             success: true,
             message: 'Account Successfully Created',
             code: constants.SuccessCode,
@@ -54,14 +54,14 @@ exports.signin = function (req, res) {
       email: req.body.email
    }).exec(function (err, user) {
       if (err) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Incorrect Login',
             code: constants.ErrorCode
          });
       }
       if (!user || user.password != crypto.createHash('md5').update(req.body.password).digest('hex')) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Email or Password is Incorrect!',
             code: constants.AuthError,
@@ -70,7 +70,7 @@ exports.signin = function (req, res) {
          user.token = crypto.createHash('sha512').update(String((new Date()).getTime())).digest('hex');
          req.session.user = user;
 
-         res.json({
+         return res.json({
             success: true,
             message: 'Logged In Successfully',
             code: constants.SuccessCode,
@@ -86,14 +86,14 @@ exports.forgotpassword = function (req, res) {
       email: req.body.email
    }).exec(function (err, user) {
       if (err) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Unable to Reset Password. Please Try Again Later...',
             code: constants.ErrorCode
          });
       }
       if (!user) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Email Does Not Exist!',
             code: constants.NoExistError,
@@ -120,14 +120,14 @@ exports.forgotpassword = function (req, res) {
          transporter.sendMail(mailOptions, function (err, info) {
             if (err) {
                console.log('forgotpassword sendEmail', err);
-               res.json({
+               return res.json({
                   success: false,
                   message: 'Unable to Forgotten Password Verification. Please try again later...',
                   code: constants.ErrorCode
                });
             }
             console.log('Forgotten Password Verification Message %s sent: %s', info.messageId, info.response);
-            res.json({
+            return res.json({
                success: true,
                message: 'Just Forgotten Password Verification Email Sent. Please check your inbox or spam',
                code: constants.SuccessCode,
@@ -144,14 +144,14 @@ exports.resetpassword = function (req, res) {
       token: req.body.token
    }).exec(function (err, user) {
       if (err) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Unable to Reset Password. Please Try Again Later...',
             code: constants.ErrorCode
          });
       }
       if (!user) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Unable to Reset Password. Please Resend Reset Password Request Email...',
             code: constants.NoExistError,
@@ -161,13 +161,13 @@ exports.resetpassword = function (req, res) {
 
          user.save(function (err) {
             if (err) {
-               res.json({
+               return res.json({
                   success: false,
                   message: 'Unable to Reset Password. Please Try Again Later...',
                   code: constants.ErrorCode
                });
             } else {
-               res.json({
+               return res.json({
                   success: true,
                   message: 'Reseted Password Successfully',
                   code: constants.SuccessCode,
@@ -183,7 +183,7 @@ exports.getVehicles = function(req, res) {
 
    Vehicle.find().sort({brand: 1, type: 1}).exec(function(err, vehicles) {
       if (err) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Failed to Get Vehicles Data. Please Try Again Later...',
             code: constants.ErrorCode
@@ -197,7 +197,7 @@ exports.getVehicles = function(req, res) {
             })
          );
 
-         res.json({
+         return res.json({
             success: true,
             message: 'Successfully Get Vehicles Data!',
             code: constants.SuccessCode,
@@ -207,11 +207,38 @@ exports.getVehicles = function(req, res) {
    });
 };
 
+exports.getBrands = function(req, res) {
+   Vehicle.find().sort({brand: 1}).exec(function(err, brands) {
+      if (err) {
+         return res.json({
+            success: false,
+            message: 'Failed to Get Registered Vehicles Brand Data. Please Try Again Later...',
+            code: constants.ErrorCode
+         });
+      } else {
+         var result = [];
+
+         for(var i = 0; i < brands.length; i++) {
+            if (!result.includes(brands[i].brand)) {
+               result.push(brands[i].brand);
+            }
+         }
+
+         return res.json({
+            success: true,
+            message: 'Successfully Get Registered Vehicles Brand Data!',
+            code: constants.SuccessCode,
+            result: result
+         });
+      }
+   });
+};
+
 exports.getPartials = function(req, res) {
    
    Wheel.find().sort({brand: 1, name: 1}).exec(function(err, wheels) {
       if (err) {
-         res.json({
+         return res.json({
             success: false,
             message: 'Failed to Get Wheels Data. Please Try Again Later...',
             code: constants.ErrorCode
@@ -243,7 +270,7 @@ exports.getPartials = function(req, res) {
 
          Partial.find({vehicle_type: req.body.vehicle_type}).sort({type: 1, name: 1}).exec(function(err, partials) {
             if (err) {
-               res.json({
+               return res.json({
                   success: false,
                   message: 'Failed to Get Partials Data. Please Try Again Later...',
                   code: constants.ErrorCode
@@ -266,11 +293,12 @@ exports.getPartials = function(req, res) {
 
                for (var i = 0; i < partials.length; i++) {
 
-                  model.modelType = partials[i].type;
-                  model.imagePath = partials[i].image;
-                  model.modelPath = partials[i].model;
-                  model.modelName = partials[i].name;
+                  model.modelType    = partials[i].type;
+                  model.imagePath    = partials[i].image;
+                  model.modelPath    = partials[i].model;
+                  model.modelName    = partials[i].name;
                   model.modelMinSize = partials[i].min_size;
+                  model.modelSizeArr = partials[i].size_arr;
 
                   if (model.modelType === 'tire') {
                      tiresData.push(model);
@@ -302,7 +330,7 @@ exports.getPartials = function(req, res) {
                   model = {};
                }
                
-               res.json({
+               return res.json({
                   success: true,
                   message: 'Successfully Get Partials Data!',
                   code: constants.SuccessCode,

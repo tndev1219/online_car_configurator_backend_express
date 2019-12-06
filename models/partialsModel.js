@@ -21,6 +21,9 @@ var partialsSchema = mongoose.Schema({
       type: Number,
       trim: true
    },
+   size_arr: {
+      type: Array
+   },
    model: {
       type: String,
       required: true,
