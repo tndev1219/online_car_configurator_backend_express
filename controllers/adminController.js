@@ -270,6 +270,7 @@ exports.addVehicle = function(req, res) {
    
    vehicle.brand = req.body.newVehicle.brand;
    vehicle.type = req.body.newVehicle.type;
+   vehicle.option_arr = req.body.newVehicle.option_arr;
    vehicle.image = req.body.newVehicle.image;
    vehicle.model = req.body.newVehicle.model;
    vehicle.lastUpdate = moment(new Date()).format('MMMM Do YYYY, hh:mm:ss a');

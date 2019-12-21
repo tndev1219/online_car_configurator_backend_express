@@ -12,6 +12,9 @@ var vehiclesSchema = mongoose.Schema({
       required: true,
       trim: true
    },
+   option_arr: {
+      type: Array
+   },
    model: {
       type: String,
       required: true,

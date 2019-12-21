@@ -192,6 +192,7 @@ exports.getVehicles = function(req, res) {
          var vehiclesData = vehicles.map(vehicle => ({
                brand: vehicle.brand,
                vehicleType: vehicle.type,
+               configOptions: vehicle.option_arr,
                modelPath: vehicle.model,
                imagePath: vehicle.image
             })
