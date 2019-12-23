@@ -13,6 +13,7 @@ var Admin = require('../models/userModel');
 var Vehicle = require('../models/vehiclesModel');
 var Wheel = require('../models/wheelsModel');
 var Partial = require('../models/partialsModel');
+var Logo = require('../models/logosModel');
 
 const jwtConfig = {
    "secret"   : "online_car_configurator_admin_sacret_key",
@@ -619,6 +620,157 @@ exports.removePartials = function(req, res) {
          return res.json({
             success: true,
             message: `Delete Partials Data Success!`,
+            code: constants.SuccessCode
+         });
+      }
+   });
+};
+
+// Logos Data CRUD
+exports.getLogos = function(req, res) {
+   
+   Logo.find().sort({name: 1}).exec(function(err, logos) {
+      if (err) {
+         return res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });
+      } else {
+         return res.json({
+            success: true,
+            message: `Get Logos Data Success!`,
+            code: constants.SuccessCode,
+            result: logos
+         });
+      }
+   });
+};
+
+exports.addLogo = function(req, res) {
+
+   var logo = new Logo();
+   
+   logo.name = req.body.newLogo.name;
+   logo.image = req.body.newLogo.image;
+   logo.active = req.body.newLogo.active;
+   logo.lastUpdate = moment(new Date()).format('MMMM Do YYYY, hh:mm:ss a');
+
+   logo.save(function (err) {
+      if (err) {
+         return res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });
+      } else {
+         return res.json({
+            success: true,
+            message: `New Logo Added!`,
+            code: constants.SuccessCode,
+            result: logo
+         });
+      }
+   });
+};
+
+exports.updateLogo = function(req, res) {
+   
+   Logo.findOneAndUpdate({_id: req.body.logo._id}, req.body.logo).exec(function(err) {
+      if (err) {
+         return res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });   
+      } else {
+         return res.json({
+            success: true,
+            message: `Update Logo Data Success!`,
+            code: constants.SuccessCode
+         });
+      }
+   });
+};
+
+exports.setLogo = function(req, res) {
+   if (req.body.logo.active) {
+      Logo.findByIdAndUpdate(req.body.logo._id, {active: true}).exec(function(err) {
+         if (err) {
+            return res.json({
+               success: false,
+               message: err.message,
+               code: constants.ErrorCode
+            });   
+         } else {
+            Logo.findOneAndUpdate({_id: { $ne: req.body.logo._id } , active: true}, {active: false}).exec(function(err) {
+               if (err) {
+                  return res.json({
+                     success: false,
+                     message: err.message,
+                     code: constants.ErrorCode
+                  });
+               } else {
+                  return res.json({
+                     success: true,
+                     message: `Set Logo Success!`,
+                     code: constants.SuccessCode
+                  });      
+               }
+            });
+         }
+      });
+   } else {
+      Logo.findByIdAndUpdate(req.body.logo._id, {active: false}).exec(function(err) {
+         if (err) {
+            return res.json({
+               success: false,
+               message: err.message,
+               code: constants.ErrorCode
+            });   
+         } else {
+            return res.json({
+               success: true,
+               message: `Set Logo Success!`,
+               code: constants.SuccessCode
+            });
+         }
+      });
+   }
+};
+
+exports.removeLogo = function(req, res) {
+   
+   Logo.findOneAndDelete({_id: req.body.logoId}).exec(function(err, logo) {
+      if (err) {
+         return res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });   
+      } else {
+         return res.json({
+            success: true,
+            message: `Delete Logo Data Success!`,
+            code: constants.SuccessCode
+         });
+      }
+   });
+};
+
+exports.removeLogos = function(req, res) {
+   
+   Logo.deleteMany({_id: req.body.logoIds}).exec(function(err) {
+      if (err) {
+         return res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });   
+      } else {
+         return res.json({
+            success: true,
+            message: `Delete Logos Data Success!`,
             code: constants.SuccessCode
          });
       }

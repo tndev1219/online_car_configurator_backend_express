@@ -10,5 +10,6 @@ router.post('/resetpassword', userController.resetpassword);
 router.post('/getVehicles', userController.authCheck, userController.getVehicles);
 router.post('/getBrands', userController.authCheck, userController.getBrands);
 router.post('/getPartials', userController.authCheck, userController.getPartials);
+router.post('/getLogo', userController.authCheck, userController.getLogo);
 
 module.exports = router;

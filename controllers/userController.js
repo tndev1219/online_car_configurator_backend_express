@@ -9,6 +9,7 @@ var User       = require('../models/userModel');
 var Vehicle    = require('../models/vehiclesModel');
 var Wheel      = require('../models/wheelsModel');
 var Partial    = require('../models/partialsModel');
+var Logo       = require('../models/logosModel');
 
 exports.authCheck = function(req, res, next) {
    next();
@@ -353,6 +354,25 @@ exports.getPartials = function(req, res) {
                   }
                });
             }
+         });
+      }
+   });
+};
+
+exports.getLogo = function(req, res) {
+   Logo.findOne({active: true}).exec(function(err, logo) {
+      if (err) {
+         return res.json({
+            success: false,
+            message: err.message,
+            code: constants.ErrorCode
+         });       
+      } else {
+         return res.json({
+            success: true,
+            message: 'Successfully Get Registered Vehicles Brand Data!',
+            code: constants.SuccessCode,
+            result: logo ? logo.image : ''
          });
       }
    });

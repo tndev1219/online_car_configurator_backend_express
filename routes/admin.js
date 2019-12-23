@@ -34,4 +34,12 @@ router.post('/updatePartial', adminController.authCheck, adminController.updateP
 router.post('/removePartial', adminController.authCheck, adminController.removePartial);
 router.post('/removePartials', adminController.authCheck, adminController.removePartials);
 
+// logos data crud
+router.post('/getLogos', adminController.authCheck, adminController.getLogos);
+router.post('/addLogo', adminController.authCheck, adminController.addLogo);
+router.post('/updateLogo', adminController.authCheck, adminController.updateLogo);
+router.post('/setLogo', adminController.authCheck, adminController.setLogo);
+router.post('/removeLogo', adminController.authCheck, adminController.removeLogo);
+router.post('/removeLogos', adminController.authCheck, adminController.removeLogos);
+
 module.exports = router;
